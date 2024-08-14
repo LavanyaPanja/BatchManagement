@@ -1,0 +1,11 @@
+package com.virtusa.springboot.insurance.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.virtusa.springboot.insurance.model.PolicyApproval;
+
+public interface PolicyApprovalRepository extends JpaRepository<PolicyApproval,Integer> {
+	public List<PolicyApproval> findByUserId(int i);
+}
