@@ -1,0 +1,18 @@
+package com.virtusa.springboot.insurance.exception;
+
+
+
+public class PolicyAlreadyExistException extends Throwable {
+
+	private static final long serialVersionUID = 1L;
+
+	public PolicyAlreadyExistException() {
+		super();
+	}
+
+	public PolicyAlreadyExistException(String message) {
+		super(message);
+	}
+	
+
+}
