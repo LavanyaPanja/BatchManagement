@@ -1,0 +1,162 @@
+package com.virtusa.springboot.insurance.services;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.virtusa.springboot.insurance.dto.PolicyDto;
+import com.virtusa.springboot.insurance.dto.UserDto;
+import com.virtusa.springboot.insurance.exception.PolicyIdException;
+import com.virtusa.springboot.insurance.model.Policy;
+import com.virtusa.springboot.insurance.model.PolicyApproval;
+import com.virtusa.springboot.insurance.model.User;
+import com.virtusa.springboot.insurance.repository.PolicyApprovalRepository;
+import com.virtusa.springboot.insurance.repository.PolicyRepository;
+import com.virtusa.springboot.insurance.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class UserService {
+	private static final Logger log = LogManager.getLogger(UserService.class);
+	@Autowired
+	private UserRepository ur;
+
+	@Autowired
+	private PolicyRepository pr;
+
+	@Autowired
+	private PolicyApprovalRepository pa;
+
+	public boolean saveMyUser(User user) {
+		User orElse = ur.findByuserName(user.getUserName());
+		if (Objects.isNull(orElse)) {
+			ur.save(user);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public User loginCheck(String username) {
+		User user = ur.findByuserName(username);
+		return user;
+
+	}
+
+	public int test(int userid) {
+		return ur.nooftimes(userid).size();
+	}
+
+	public boolean test1(List<Policy> p, Policy p1) {
+		boolean contains = p.contains(p1);
+		return contains;
+	}
+
+	public Boolean assignValues(int id, int policyid) throws PolicyIdException {
+		int a = test(id);
+		log.info(a);
+		if (a < 2) {
+			Set<Policy> policySet = null;
+			User user = ur.findById(id).orElse(null);
+			// System.out.println(user);
+			Policy policy = pr.findById(policyid).orElse(null);
+			// System.out.println(policy);
+			policySet = user.getPolicy();
+			policySet.add(policy);
+			user.setPolicy(policySet);
+			ur.save(user);
+			Set<User> userSet = null;
+			userSet = policy.getUser();
+			userSet.add(user);
+			policy.setUser(userSet);
+			pr.save(policy);
+
+			// Set<PolicyApproval> list=null;
+			PolicyApproval p = new PolicyApproval();
+			p.setPolicyId(policy.getId());
+			p.setUserId(user.getId());
+			pa.save(p);
+			return true;
+		} else {
+			return false;
+		}
+
+		// return
+	}
+
+	public List<Policy> showPolicy() {
+		List<Policy> p = pr.findAll();
+		return p;
+	}
+
+	public List<PolicyDto> userStatus(int i) {
+		List<PolicyApproval> c = pa.findByUserId(i);
+		System.out.println(c);
+		List<PolicyDto> pd = new ArrayList<>();
+		if (Objects.isNull(c)) {
+			return null;
+		} else {
+
+			for (PolicyApproval s : c) {
+				PolicyDto p = new PolicyDto();
+				p.setUserid(s.getUserId());
+				p.setStatus(s.getStatus());
+				List<Policy> policyId = pr.findByPolicyId(s.getPolicyId());
+				p.setPolicy(policyId);
+				pd.add(p);
+
+			}
+
+			return pd;
+		}
+	}
+
+	public User showProfile(int attribute) {
+		User user = ur.findById(attribute).orElse(null);
+		return user;
+	}
+
+	public void editProfile(int attribute, UserDto userdto) {
+		User user = ur.findById(attribute).orElse(null);
+		if (userdto.getName() == "") {
+
+			userdto.setName(user.getName());
+		}
+		if (userdto.getAge() == 0) {
+			userdto.setAge(user.getAge());
+		}
+		if (userdto.getAdress() == "") {
+			userdto.setAdress(user.getAddress());
+		}
+			user.setName(userdto.getName());
+			user.setAge(userdto.getAge());
+			user.setAddress(userdto.getAdress());
+
+			ur.save(user);
+	}
+
+	/*
+	 * public void assignValues(int id, int id1) { Policy else1 =
+	 * pr.findById(id).orElse(null); User name2 = ur.findByuserName(id1); //Set<Foo>
+	 * foo = new HashSet<Foo>(myList); // Set<Policy> p1=new
+	 * HashSet<Policy>(name2.getPolicy()); //Set<User> u1=new
+	 * HashSet<User>(else1.getUser()); Set<Policy> p1=name2.getPolicy(); Set<User>
+	 * u1=else1.getUser(); //List<Policy> p=name2.getPolicy(); //List<User>
+	 * u=else1.getUser(); boolean add = p1.add(else1); boolean add2 = u1.add(name2);
+	 * 
+	 * else1.setUser(u1); name2.setPolicy(p1);
+	 * 
+	 * pr.save(else1); ur.save(name2);
+	 * 
+	 * }
+	 */
+
+}
