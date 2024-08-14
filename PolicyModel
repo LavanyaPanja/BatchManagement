@@ -1,0 +1,110 @@
+package com.virtusa.springboot.insurance.model;
+
+import java.util.Objects;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+@Entity
+@Table(name="Policy", uniqueConstraints=@UniqueConstraint(columnNames = { "policyName", "totalAmount" }))
+public class Policy {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int policyid;
+	private String policyName;
+	private int totalAmount;
+	private int interest;
+	private int minAmount;
+	
+	@ManyToMany(cascade =CascadeType.ALL)
+	@JsonIgnore
+	private Set<User> user;
+	
+	
+	public Set<User> getUser() {
+		return user;
+	}
+
+	public void setUser(Set<User> u1) {
+		this.user = u1;
+	}
+
+	public Policy() {
+		super();
+	}
+	
+	public Policy(String policyName, int totalAmount, int interest, int minAmount) {
+		super();
+		this.policyName = policyName;
+		this.totalAmount = totalAmount;
+		this.interest = interest;
+		this.minAmount = minAmount;
+	}
+	
+	public int getId() {
+		return policyid;
+	}
+	public void setId(int id) {
+		this.policyid = id;
+	}
+	public String getPolicyName() {
+		return policyName;
+	}
+	public void setPolicyName(String policyName) {
+		this.policyName = policyName;
+	}
+	public int getTotalAmount() {
+		return totalAmount;
+	}
+	public void setTotalAmount(int totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+	public int getInterest() {
+		return interest;
+	}
+	public void setInterest(int interest) {
+		this.interest = interest;
+	}
+	public int getMinAmount() {
+		return minAmount;
+	}
+	public void setMinAmount(int minAmount) {
+		this.minAmount = minAmount;
+	}
+	@Override
+	public String toString() {
+		return "Policy [id=" + policyid + ", policyName=" + policyName + ", totalAmount=" + totalAmount + ", interest="
+				+ interest + ", minAmount=" + minAmount + "]";
+	}
+	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(interest, minAmount, policyName, policyid, totalAmount, user);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Policy other = (Policy) obj;
+		return interest == other.interest && minAmount == other.minAmount
+				&& Objects.equals(policyName, other.policyName) && policyid == other.policyid
+				&& totalAmount == other.totalAmount && Objects.equals(user, other.user);
+	}
+	
+	
+}
