@@ -1,0 +1,34 @@
+package com.virtusa.springboot.insurance.model;
+
+public class HibernateValidator {
+	private String fieldName;
+	private String message;
+	public String getFieldName() {
+		return fieldName;
+	}
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	public HibernateValidator(String fieldName, String message) {
+		super();
+		this.fieldName = fieldName;
+		this.message = message;
+	}
+	public HibernateValidator() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	@Override
+	public String toString() {
+		return "HibernateValidator [fieldName=" + fieldName + ", message=" + message + "]";
+	}
+	
+	
+	
+}
