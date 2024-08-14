@@ -1,0 +1,17 @@
+package com.virtusa.springboot.insurance.exception;
+
+public class PolicyIdException extends Exception{
+
+	private static final long serialVersionUID = 1L;
+
+	public PolicyIdException() {
+		super();
+		
+	}
+
+	public PolicyIdException(String message) {
+		super(message);
+	}
+	
+
+}
