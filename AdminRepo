@@ -1,0 +1,11 @@
+package com.virtusa.springboot.insurance.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.virtusa.springboot.insurance.model.Admin;
+
+public interface AdminRepository extends JpaRepository<Admin, String>{
+
+	public Admin findByuserName(String username);
+
+}
