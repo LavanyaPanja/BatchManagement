@@ -1,0 +1,23 @@
+package com.virtusa.springboot.insurance.services;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.virtusa.springboot.insurance.model.Policy;
+import com.virtusa.springboot.insurance.repository.PolicyRepository;
+
+import jakarta.transaction.Transactional;
+@Service
+@Transactional
+public class CommonService {
+	@Autowired
+	private PolicyRepository pr;
+	
+	public List<Policy> viewPolicy(){
+		return pr.findAll();
+		
+		
+	}
+}
