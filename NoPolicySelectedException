@@ -1,0 +1,24 @@
+package com.virtusa.springboot.insurance.exception;
+
+public class NoPolicySelectedException extends Exception{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public NoPolicySelectedException() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public NoPolicySelectedException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
+	}
+		
+	
+	
+	
+		
+}
