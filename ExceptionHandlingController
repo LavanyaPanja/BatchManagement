@@ -1,0 +1,110 @@
+package com.virtusa.springboot.insurance.controller;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.virtusa.springboot.insurance.exception.AlreadyAcceptedException;
+import com.virtusa.springboot.insurance.exception.AlreadyDeclineException;
+import com.virtusa.springboot.insurance.exception.LoginException;
+import com.virtusa.springboot.insurance.exception.NoPolicySelectedException;
+import com.virtusa.springboot.insurance.exception.PolicyAlreadyExistException;
+import com.virtusa.springboot.insurance.exception.PolicyIdException;
+import com.virtusa.springboot.insurance.exception.UserAlreadyExistException;
+import com.virtusa.springboot.insurance.model.HibernateValidator;
+
+import jakarta.validation.ConstraintViolationException;
+
+
+@RestControllerAdvice
+public class ExceptionHandlerController {
+	private static final Logger log = LogManager.getLogger(ExceptionHandlerController.class);
+	
+//	@ExceptionHandler(ConstraintViolationException.class)
+//	public ResponseEntity<HibernateValidator> hibernateValidator(ConstraintViolationException validException) {
+//		//FieldError fieldError = validException.getBindingResult().getFieldError();
+//		FieldError fieldError = (FieldError) validException.getConstraintViolations();
+//		HibernateValidator validator = new HibernateValidator(fieldError.getField(), fieldError.getDefaultMessage());
+//		return new ResponseEntity<HibernateValidator>(validator, HttpStatus.BAD_REQUEST);
+// 
+//	}
+//	@ExceptionHandler(ConstraintViolationException.class)
+//	public String hibernateValidator(ConstraintViolationException validException) {
+//		
+//		
+//		//String message = validException.getMessage();
+//	//	System.out.println(validException.getLocalizedMessage());
+//		//System.out.println("hi"+message);
+//		
+//		
+//		return "Must Not Empty";
+// 
+//	}
+	
+	
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<HibernateValidator> hibernateValidator(MethodArgumentNotValidException validException) {
+		FieldError fieldError = validException.getBindingResult().getFieldError();
+		HibernateValidator validator = new HibernateValidator(fieldError.getField(), fieldError.getDefaultMessage());
+		return new ResponseEntity<HibernateValidator>(validator, HttpStatus.BAD_REQUEST);
+ 
+	}
+	
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<HibernateValidator> hibernateValidatorEx(ConstraintViolationException validException) {
+		//FieldError fieldError = validException.getBindingResult().getFieldError();
+		//FieldError fieldError= validException.getMessage();
+		HibernateValidator validator = new HibernateValidator(validException.getLocalizedMessage(),validException.getMessage());
+		return new ResponseEntity<HibernateValidator>(validator, HttpStatus.BAD_REQUEST);
+ 
+	}
+		
+	@ExceptionHandler(LoginException.class)
+	public ResponseEntity<String> LoginException(LoginException e){
+		log.error(e.getMessage());
+		return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_ACCEPTABLE);
+	}
+	
+	@ExceptionHandler(PolicyIdException.class)
+	public ResponseEntity<String> PolicyIdException(PolicyIdException e){
+		log.error(e.getMessage());
+		return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_ACCEPTABLE);
+	}
+	
+	@ExceptionHandler(UserAlreadyExistException.class)
+	public ResponseEntity<String> UserAlreadyExistException(UserAlreadyExistException e){
+		log.error(e.getMessage());
+		return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_ACCEPTABLE);
+	}
+	
+	@ExceptionHandler(PolicyAlreadyExistException.class)
+	public ResponseEntity<String> PolicyAlreadyExistException(PolicyAlreadyExistException e){
+		log.error(e.getMessage());
+		return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_ACCEPTABLE);
+	}
+	
+	@ExceptionHandler(AlreadyAcceptedException.class)
+	public ResponseEntity<String> AlreadyAcceptedException(AlreadyAcceptedException e){
+		log.error(e.getMessage());
+		return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_ACCEPTABLE);
+	}
+	
+	@ExceptionHandler(AlreadyDeclineException.class)
+	public ResponseEntity<String> AlreadyDeclineException(AlreadyDeclineException e){
+		log.error(e.getMessage());
+		return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_ACCEPTABLE);
+	}
+	
+	@ExceptionHandler(NoPolicySelectedException.class)
+	public ResponseEntity<String> NoPolicySelectedException(NoPolicySelectedException e){
+		log.error(e.getMessage());
+		return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_ACCEPTABLE);
+	}
+
+}
