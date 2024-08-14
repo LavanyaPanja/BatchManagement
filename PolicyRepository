@@ -1,0 +1,22 @@
+package com.virtusa.springboot.insurance.repository;
+
+
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.virtusa.springboot.insurance.model.Policy;
+
+public interface PolicyRepository extends JpaRepository<Policy,Integer>{
+
+	Policy findBypolicyName(String policyName);
+
+	Policy findBytotalAmount(int totalAmount);
+   @Query("from Policy where policyid=:i")
+	List<Policy> findByPolicyId(int i);
+	
+	
+
+}
