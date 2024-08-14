@@ -1,0 +1,45 @@
+package com.virtusa.springboot.insurance.dto;
+
+import java.util.List;
+
+import com.virtusa.springboot.insurance.model.Policy;
+
+public class PolicyDto {
+	private int userid;
+	private String status;
+	private List<Policy> policy;
+	public PolicyDto() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public PolicyDto(int userid, String status, List<Policy> policy) {
+		super();
+		this.userid = userid;
+		this.status = status;
+		this.policy = policy;
+	}
+	public int getUserid() {
+		return userid;
+	}
+	public void setUserid(int userid) {
+		this.userid = userid;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public List<Policy> getPolicy() {
+		return policy;
+	}
+	public void setPolicy(List<Policy> policy) {
+		this.policy = policy;
+	}
+	@Override
+	public String toString() {
+		return "PolicyDto [userid=" + userid + ", status=" + status + ", policy=" + policy + "]";
+	}
+	
+	
+}
