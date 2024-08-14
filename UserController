@@ -1,0 +1,191 @@
+package com.virtusa.springboot.insurance.controller;
+
+import java.util.List;
+import java.util.Objects;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.virtusa.springboot.insurance.dto.PolicyDto;
+import com.virtusa.springboot.insurance.dto.UserDto;
+import com.virtusa.springboot.insurance.exception.LoginException;
+import com.virtusa.springboot.insurance.exception.NoPolicySelectedException;
+import com.virtusa.springboot.insurance.exception.PolicyIdException;
+import com.virtusa.springboot.insurance.exception.UserAlreadyExistException;
+import com.virtusa.springboot.insurance.model.Login;
+import com.virtusa.springboot.insurance.model.Policy;
+import com.virtusa.springboot.insurance.model.User;
+import com.virtusa.springboot.insurance.services.CommonService;
+import com.virtusa.springboot.insurance.services.UserService;
+
+import jakarta.servlet.http.HttpSession;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+	@Autowired
+	UserService us;
+
+	@Autowired
+	CommonService cs;
+
+	Logger log = LogManager.getLogger(UserController.class);
+
+	@GetMapping("/saveUser")
+	public String saveUser(@RequestParam String userName, @RequestParam String name, @RequestParam String address,
+			@RequestParam int age, @RequestParam String passWord) {
+		User u = new User(name, address, age, userName, passWord);
+		us.saveMyUser(u);
+		return "user saved";
+	}
+
+	@GetMapping("/register")
+	public String registerUser() {
+		return "register";
+	}
+
+	@GetMapping("/showPolicy")
+	public String showPolicy(Model m) {
+		m.addAttribute("data", cs.viewPolicy());
+		return "showPolicy";
+	}
+
+	@GetMapping("/userLogin")
+	public String loginUser(@ModelAttribute("user") Login login) {
+		return "userlogin";
+	}
+
+	@GetMapping("/welcomePage")
+	public String loggedin() {
+		return "welcomeUser";
+	}
+
+	/*
+	 * @RequestMapping("/assign/{id}/{name}") public String
+	 * userhome(@PathVariable("id") int id,@PathVariable("name") String name) {
+	 * us.assignValues(id,name); System.out.println(id + " " + name); return null; }
+	 */
+
+	/* User Registration */
+	@PostMapping("/postRegister")
+	public ResponseEntity<String> postRegister(@RequestBody User user) throws UserAlreadyExistException {
+		log.info(user);
+		boolean saveMyUser = us.saveMyUser(user);
+		if (saveMyUser) {
+
+			return new ResponseEntity<String>("User Sucessfully saved", HttpStatus.OK);
+		} else {
+			throw new UserAlreadyExistException("User Already Exist");
+		}
+
+	}
+	/* User Login */
+
+	@PostMapping("/loginCheckUser")
+	public ResponseEntity<String> checkLogin(@RequestBody Login login, HttpSession session) throws LoginException {
+		log.info("hello");
+		User loginCheck = us.loginCheck(login.getUsername());
+		log.info(loginCheck);
+		if (Objects.isNull(loginCheck) || !(login.getPassword().equals(loginCheck.getPassword()))) {
+
+			throw new LoginException("Login Credentials are wrong");
+			// return new ResponseEntity<String>("Login Credentials are wrong",
+			// HttpStatus.OK);
+		} else {
+			session.setAttribute("userid", loginCheck.getId());
+			session.setAttribute("username", loginCheck.getUserName());
+
+			return new ResponseEntity<String>("Login sucessfull", HttpStatus.OK);
+		}
+	}
+
+	/* Showing Policy */
+
+	@GetMapping("/policy")
+	public ResponseEntity<List<Policy>> showPolicy() {
+		List<Policy> p = us.showPolicy();
+		return new ResponseEntity<List<Policy>>(p, HttpStatus.FOUND);
+	}
+
+	/* Showing user profile */
+
+	@GetMapping("/showProfile")
+	public ResponseEntity<User> showProfile(HttpSession session) {
+		int attribute = (int) session.getAttribute("userid");
+		User u = us.showProfile(attribute);
+		return new ResponseEntity<User>(u, HttpStatus.FOUND);
+	}
+
+	@PutMapping("/editProfile")
+	public ResponseEntity<String> editProfile(@RequestBody UserDto userdto, HttpSession session) throws PolicyIdException,IllegalArgumentException {
+		int attribute = (int) session.getAttribute("userid");
+		us.editProfile(attribute, userdto);
+		return new ResponseEntity<String>("User Sucessfully updated", HttpStatus.FOUND);
+
+	}
+
+	/* Choosing policy */
+
+	@PutMapping("/policy/{policyid}")
+	public ResponseEntity<String> userhome(@PathVariable("policyid") int id1, HttpSession session)
+			throws PolicyIdException {
+		int i = (int) session.getAttribute("userid");
+		Boolean assignValues = us.assignValues(i, id1);
+		if (assignValues) {
+
+			return new ResponseEntity<String>("Policy selected", HttpStatus.ACCEPTED);
+		} else {
+			throw new PolicyIdException(
+					"Policy selection is limited ");
+			//throw new IllegalArgumentException("ekada nunchi vachav ra nuvvu");
+		}
+
+	}
+
+	@GetMapping("/showPolicy/status")
+	public ResponseEntity<List<PolicyDto>> userStatus(HttpSession session) throws NoPolicySelectedException {
+		int i = (int) session.getAttribute("userid");
+		List<PolicyDto> p = us.userStatus(i);
+
+		if (p.isEmpty()) {
+			// return new ResponseEntity<String>("User vunadu ra bhai",HttpStatus.OK);
+			throw new NoPolicySelectedException("NoPolicy Selected");
+			
+
+		} else {
+			return new ResponseEntity<List<PolicyDto>>(p,HttpStatus.OK);
+		}
+	}
+
+	/*
+	 * @GetMapping("/test/{userid}") public int test(@PathVariable("userid") int id)
+	 * { return us.test(id); }
+	 * 
+	 * 
+	 * @GetMapping("/showStatus") public List<PolicyApproval> statusShow(HttpSession
+	 * session){ int i=(int)session.getAttribute("userid");
+	 * 
+	 * 
+	 * }
+	 * 
+	 */
+	/*
+	 * @GetMapping("/{id}") public ResponseEntity<String>
+	 * showIdPolicy(@PathVariable("id") int id){
+	 * 
+	 * }
+	 */
+}
