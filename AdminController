@@ -1,0 +1,175 @@
+  package com.virtusa.springboot.insurance.controller;
+
+
+import java.util.List;
+import java.util.Objects;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.virtusa.springboot.insurance.exception.AlreadyAcceptedException;
+import com.virtusa.springboot.insurance.exception.AlreadyDeclineException;
+import com.virtusa.springboot.insurance.exception.LoginException;
+import com.virtusa.springboot.insurance.exception.PolicyAlreadyExistException;
+import com.virtusa.springboot.insurance.model.Admin;
+import com.virtusa.springboot.insurance.model.Login;
+import com.virtusa.springboot.insurance.model.Policy;
+import com.virtusa.springboot.insurance.model.PolicyApproval;
+import com.virtusa.springboot.insurance.repository.UserRepository;
+import com.virtusa.springboot.insurance.services.AdminService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/admin")
+public class AdminController {
+	
+	@Autowired
+	UserRepository userRepository;
+
+	@ResponseBody
+	@RequestMapping("/home")
+	public String Hello() {
+
+		return "Hello admin"; 
+	}
+
+	@RequestMapping("/welcome")
+	public String Hello10() {
+
+		return "welcomeadmin";
+	}
+	
+	
+
+	@Autowired
+	AdminService as;
+	Logger log = LogManager.getLogger(AdminController.class);
+
+	/*
+	 * @GetMapping("/savePolicies") public String savePolicy(@RequestParam String
+	 * policyName, @RequestParam int totalAmount, @RequestParam int interest,
+	 * 
+	 * @RequestParam int minAmount) { Policy a = new Policy(policyName, totalAmount,
+	 * interest, minAmount); //as.saveMyPolicy(a); return "Policy saved"; }
+	 */
+
+	@GetMapping("/savePolicy")
+	public String savePolicy() {
+		return "policyEntry";
+	}
+
+	
+	                    /*Policy Creation*/
+	
+	@PostMapping("/postPolicy")
+	public ResponseEntity<String> postRegister(@RequestBody Policy policy) throws PolicyAlreadyExistException {
+		log.info(policy);
+		
+		boolean policies=as.saveMyPolicy(policy);
+		if(policies==true) {
+			//as.saveMyPolicy(policy);
+			return new ResponseEntity<String>("saved successfully",HttpStatus.OK);
+		}
+		else {
+			throw new PolicyAlreadyExistException("Policy already exist");
+		}
+		/*if(Objects.isNull(policy)) {
+			throw new PolicyAlreadyExistException("Panileda neku!!!!!");
+
+		}
+		else {
+			as.saveMyPolicy(policy);
+			return new ResponseEntity<String>("saved successfully",HttpStatus.OK);
+
+		}
+		try {
+			as.saveMyPolicy(policy);
+			//throw new PolicyAlreadyExistException("Panileda neku!!!!!");
+			return new ResponseEntity<String>("saved successfully",HttpStatus.OK);
+		}
+		catch(Exception e) {
+			return new ResponseEntity<String>("Panileda neeku!!!!",HttpStatus.CONFLICT);
+		}*/
+	}
+
+							/*Admin Login*/
+	
+	@PostMapping("/loginCheckAdmin")
+	public ResponseEntity<String> checkLogin(@Valid @RequestBody Login login) throws LoginException {
+		Admin loginCheck = as.loginCheck(login.getUsername());
+		if (Objects.isNull(loginCheck) || !(login.getPassword().equals(loginCheck.getPassWord()))) {
+			throw new LoginException("Login Credentials are wrong");
+			//return new ResponseEntity<String>("Dabanggg Dabangg", HttpStatus.OK);
+		} else {
+
+			return new ResponseEntity<String>("login sucessful", HttpStatus.ACCEPTED);
+		}
+	}
+	
+	
+	
+	   
+
+	                /*Admin Checking Registered Policies*/
+	
+	@GetMapping("/policiesRegistered")
+	public ResponseEntity<List<PolicyApproval>> policyApproval(){
+		List<PolicyApproval> p=as.policyApproval();
+		return new ResponseEntity<List<PolicyApproval>> (p,HttpStatus.OK);
+	}
+	
+				    /*Admin Accepting Registered Policies*/
+	@PutMapping("/{id}/accept")
+	public ResponseEntity<String> statusAccept(@PathVariable("id") int id) throws AlreadyAcceptedException{
+		PolicyApproval p= as.statusChange(id);
+		boolean b=Objects.isNull(p);
+		if(!b) {
+			if (!p.getStatus().equals("Accept")) {
+				p.setStatus("Accept");
+				as.saveMyPolicy(p);
+				return new ResponseEntity<String>("Accepted",HttpStatus.ACCEPTED);}
+			else {
+				throw new AlreadyAcceptedException("Already accepted");
+			}
+		}
+		else {
+			return new ResponseEntity<String>("Content vunodiki policy avasaram ledu",HttpStatus.OK);
+
+		}
+	}
+		
+					/*Admin Declining Registered Policies*/
+	@PutMapping("/{id}/decline")
+	public ResponseEntity<String> statusDecline(@PathVariable("id") int id) throws AlreadyDeclineException{
+		PolicyApproval p= as.statusChange(id);
+		System.out.println(p);
+		boolean b=Objects.isNull(p);
+		if(!b) {
+			if (!p.getStatus().equals("Decline")) {
+				p.setStatus("Decline");
+				as.saveMyPolicy(p);
+				return new ResponseEntity<String>("Declined",HttpStatus.GONE);}
+			else {
+				throw new AlreadyDeclineException("Already declined");
+				}
+			}
+			else {
+				return new ResponseEntity<String>("Content vunodiki policy avasaram ledu",HttpStatus.OK);
+
+			}
+	}
+	
+	
+}
