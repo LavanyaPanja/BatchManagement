@@ -1,0 +1,15 @@
+package com.virtusa.springboot.insurance.exception;
+
+public class AlreadyDeclineException extends Exception {
+	
+	private static final long serialVersionUID = 1L;
+
+	public AlreadyDeclineException() {
+		super();
+	}
+
+	public AlreadyDeclineException(String message) {
+		super(message);
+	}
+
+}
