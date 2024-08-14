@@ -1,0 +1,14 @@
+package com.virtusa.springboot.insurance.exception;
+
+public class LoginException extends Exception {
+	
+	private static final long serialVersionUID = -8430498551896512038L;
+
+		public LoginException() {
+			
+		}
+		
+		public LoginException(String message) {
+			super(message);
+		}  
+}
