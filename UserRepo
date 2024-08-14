@@ -1,0 +1,18 @@
+package com.virtusa.springboot.insurance.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.virtusa.springboot.insurance.model.Policy;
+import com.virtusa.springboot.insurance.model.User;
+
+public interface UserRepository extends JpaRepository<User,Integer> {
+	public User findByuserName(String name);
+	
+	@Query("SELECT policy FROM User p WHERE id=?1")
+	public List<Policy> nooftimes(int user_id);
+	
+	
+}
