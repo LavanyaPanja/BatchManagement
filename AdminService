@@ -1,0 +1,82 @@
+package com.virtusa.springboot.insurance.services;
+
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.virtusa.springboot.insurance.model.Admin;
+import com.virtusa.springboot.insurance.model.Policy;
+import com.virtusa.springboot.insurance.model.PolicyApproval;
+import com.virtusa.springboot.insurance.repository.AdminRepository;
+import com.virtusa.springboot.insurance.repository.PolicyApprovalRepository;
+import com.virtusa.springboot.insurance.repository.PolicyRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class AdminService {
+	 
+	
+	
+	
+		@Autowired
+		private PolicyRepository pr;
+		
+		@Autowired
+		private AdminRepository ar;
+		
+		@Autowired
+		private PolicyApprovalRepository pa;
+		
+//		public boolean saveMyPolicy(Policy policy) {
+//			Policy p=pr.findBypolicyName(policy.getPolicyName());
+//			Policy p1=pr.findBytotalAmount(p.getTotalAmount());
+//			System.out.println(p);
+//			System.out.println(p1);
+//			if(!Objects.isNull(p1)) {
+//					return false;
+//			}
+//			else {
+//				return true;
+//			}
+//	
+//		}
+		public Boolean saveMyPolicy(Policy p)  {
+			Policy policy=pr.findById(p.getId()).orElse(null);
+			if(Objects.isNull(policy)) {
+				pr.save(p);
+				return true;
+			}
+			else {
+				return false;
+			}
+			
+		}
+		
+		public PolicyApproval saveMyPolicy(PolicyApproval p) {
+			return pa.save(p);
+		}
+		public Admin loginCheck(String username) {
+			Admin admin = ar.findByuserName(username);
+			return admin;
+		}
+
+		public List<PolicyApproval> policyApproval() {
+			
+			List<PolicyApproval> p=pa.findAll();
+			return p;
+		}
+
+		public PolicyApproval statusChange(int id) {
+			//System.out.println("in service");
+			PolicyApproval lpa= pa.findById(id).orElse(null);
+			return lpa;
+
+		}
+
+		
+
+}
