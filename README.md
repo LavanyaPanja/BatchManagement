@@ -1,1 +1,1 @@
-Insurence APplication
+Insurence Application
